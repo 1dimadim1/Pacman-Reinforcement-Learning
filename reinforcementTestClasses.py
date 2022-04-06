@@ -20,6 +20,7 @@ from util import Counter, TimeoutFunction, FixedRandom
 from collections import defaultdict
 from pprint import PrettyPrinter
 from hashlib import sha1
+from functools import reduce
 pp = PrettyPrinter()
 VERBOSE = False
 
@@ -38,7 +39,7 @@ class ValueIterationTest(testClasses.TestCase):
         if 'noise' in testDict: self.grid.setNoise(float(testDict['noise']))
         if 'livingReward' in testDict: self.grid.setLivingReward(float(testDict['livingReward']))
         maxPreIterations = 10
-        self.numsIterationsForDisplay = range(min(iterations, maxPreIterations))
+        self.numsIterationsForDisplay = list(range(min(iterations, maxPreIterations)))
         self.testOutFile = testDict['test_out_file']
         if maxPreIterations < iterations:
             self.numsIterationsForDisplay.append(iterations)
@@ -131,7 +132,7 @@ class ValueIterationTest(testClasses.TestCase):
             policy[state] = agent.computeActionFromValues(state)
             possibleActions = self.grid.getPossibleActions(state)
             for action in actions:
-                if not qValues.has_key(action):
+                if action not in qValues:
                     qValues[action] = {}
                 if action in possibleActions:
                     qValues[action][state] = agent.computeQValueFromValues(state, action)
@@ -213,7 +214,7 @@ class ApproximateQLearningTest(testClasses.TestCase):
         self.opts = {'actionFn': self.env.getPossibleActions, 'epsilon': self.epsilon, 'gamma': self.discount, 'alpha': self.learningRate}
         numExperiences = int(testDict['numExperiences'])
         maxPreExperiences = 10
-        self.numsExperiencesForDisplay = range(min(numExperiences, maxPreExperiences))
+        self.numsExperiencesForDisplay = list(range(min(numExperiences, maxPreExperiences)))
         self.testOutFile = testDict['test_out_file']
         if maxPreExperiences < numExperiences:
             self.numsExperiencesForDisplay.append(numExperiences)
@@ -278,7 +279,7 @@ class ApproximateQLearningTest(testClasses.TestCase):
 
     def runAgent(self, moduleDict, numExperiences):
         agent = moduleDict['qlearningAgents'].ApproximateQAgent(extractor=self.extractor, **self.opts)
-        states = filter(lambda state : len(self.grid.getPossibleActions(state)) > 0, self.grid.getStates())
+        states = [state for state in self.grid.getStates() if len(self.grid.getPossibleActions(state)) > 0]
         states.sort()
         randObj = FixedRandom().random
         # choose a random start state and a random possible action from that state
@@ -296,7 +297,7 @@ class ApproximateQLearningTest(testClasses.TestCase):
         for state in states:
             possibleActions = self.grid.getPossibleActions(state)
             for action in actions:
-                if not qValues.has_key(action):
+                if action not in qValues:
                     qValues[action] = {}
                 if action in possibleActions:
                     qValues[action][state] = agent.getQValue(state, action)
@@ -373,7 +374,7 @@ class QLearningTest(testClasses.TestCase):
         self.opts = {'actionFn': self.env.getPossibleActions, 'epsilon': self.epsilon, 'gamma': self.discount, 'alpha': self.learningRate}
         numExperiences = int(testDict['numExperiences'])
         maxPreExperiences = 10
-        self.numsExperiencesForDisplay = range(min(numExperiences, maxPreExperiences))
+        self.numsExperiencesForDisplay = list(range(min(numExperiences, maxPreExperiences)))
         self.testOutFile = testDict['test_out_file']
         if maxPreExperiences < numExperiences:
             self.numsExperiencesForDisplay.append(numExperiences)
@@ -453,7 +454,7 @@ class QLearningTest(testClasses.TestCase):
 
     def runAgent(self, moduleDict, numExperiences):
         agent = moduleDict['qlearningAgents'].QLearningAgent(**self.opts)
-        states = filter(lambda state : len(self.grid.getPossibleActions(state)) > 0, self.grid.getStates())
+        states = [state for state in self.grid.getStates() if len(self.grid.getPossibleActions(state)) > 0]
         states.sort()
         randObj = FixedRandom().random
         # choose a random start state and a random possible action from that state
@@ -474,7 +475,7 @@ class QLearningTest(testClasses.TestCase):
             policy[state] = agent.computeActionFromQValues(state)
             possibleActions = self.grid.getPossibleActions(state)
             for action in actions:
-                if not qValues.has_key(action):
+                if action not in qValues:
                     qValues[action] = {}
                 if action in possibleActions:
                     qValues[action][state] = agent.getQValue(state, action)
@@ -569,7 +570,7 @@ class EpsilonGreedyTest(testClasses.TestCase):
 
     def runAgent(self, moduleDict):
         agent = moduleDict['qlearningAgents'].QLearningAgent(**self.opts)
-        states = filter(lambda state : len(self.grid.getPossibleActions(state)) > 0, self.grid.getStates())
+        states = [state for state in self.grid.getStates() if len(self.grid.getPossibleActions(state)) > 0]
         states.sort()
         randObj = FixedRandom().random
         # choose a random start state and a random possible action from that state
