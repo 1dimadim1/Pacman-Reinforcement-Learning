@@ -14,7 +14,6 @@
 
 import util
 from graphicsUtils import *
-from functools import reduce
 
 class GraphicsGridworldDisplay:
 
@@ -270,7 +269,7 @@ def drawSquareQ(x, y, qVals, minVal, maxVal, valStrs, bestActions, isCurrent):
     w = (screen_x-0.5*GRID_SIZE+5, screen_y)
     e = (screen_x+0.5*GRID_SIZE-5, screen_y)
 
-    actions = list(qVals.keys())
+    actions = qVals.keys()
     for action in actions:
 
         wedge_color = getColor(qVals[action], minVal, maxVal)
@@ -345,5 +344,5 @@ def to_grid(point):
     (x, y) = point
     x = int ((y - MARGIN + GRID_SIZE * 0.5) / GRID_SIZE)
     y = int ((x - MARGIN + GRID_SIZE * 0.5) / GRID_SIZE)
-    print(point, "-->", (x, y))
+    print point, "-->", (x, y)
     return (x, y)
