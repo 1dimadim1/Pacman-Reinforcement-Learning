@@ -45,14 +45,11 @@ class ValueIterationAgent(ValueEstimationAgent):
 
         # Value iteration loop set up for self.iterations iterations
         for i in range(iterations):
-          #intializing a temporary counter to store an iteration's value for each state.
           iterationValues = util.Counter()
-          #looking at each state
-          for s in self.mdp.getStates():
-            # if the state is terminal, the reward is the exit reward and no discounted rewards as it is the absorbing state
+
+          for s in self.mdp.getStates():            
             if self.mdp.isTerminal(s):
               self.values[s] = self.mdp.getReward(s, 'exit', '')
-            # if the state is non-terminal, then finding the best value as the maximum of expected sum of rewards of different actions.
             else:
               actions = self.mdp.getPossibleActions(s)
               iterationValues[s] = max([self.computeQValueFromValues(s, a) for a in actions])
@@ -74,8 +71,6 @@ class ValueIterationAgent(ValueEstimationAgent):
         #computing the transitions states and probability
         transitionStatesAndProbs = self.mdp.getTransitionStatesAndProbs(state, action)
         value = 0
-        #for each transition, the value is calculated as the summ of reward of getting to that transition and discounted value of transition state
-        #summing these transition values gives the q-value for a state action pair. 
         for ts in transitionStatesAndProbs:
           stateTransitionReward = self.mdp.getReward(state, action, ts[0])
           value = value + stateTransitionReward + self.discount*(self.values[ts[0]]*ts[1])
